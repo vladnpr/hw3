@@ -5,8 +5,8 @@ type MainCharacter struct {
 	Age  int
 }
 
-func NewMainCharacter(name string, age int) MainCharacter {
+func NewMainCharacter(name string) MainCharacter {
 	return MainCharacter{
-		Name: name, Age: age,
+		Name: name,
 	}
 }
