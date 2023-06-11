@@ -5,11 +5,15 @@ import "go_course/hw3/item"
 type MainCharacter struct {
 	Name      string
 	Age       int
-	Inventory [10]item.Item
+	Inventory []item.Item
+}
+
+func (mc *MainCharacter) AddToInventory(items ...item.Item) {
+	mc.Inventory = append(mc.Inventory, items...)
 }
 
 func NewMainCharacter(name string, age int) MainCharacter {
 	return MainCharacter{
-		name, age, [10]item.Item{},
+		Name: name, Age: age,
 	}
 }
