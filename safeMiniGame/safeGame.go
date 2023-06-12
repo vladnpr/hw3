@@ -22,7 +22,6 @@ func CodeTry() string {
 			break
 		} else {
 			fmt.Printf("Код не вірний. Спробуй ще\n\n")
-			CodeTry()
 		}
 	}
 
