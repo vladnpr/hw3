@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"go_course/hw3/character"
-	"go_course/hw3/scenario"
+	"go_course/hw3/newWorldScenario"
 )
 
 func main() {
@@ -15,5 +15,6 @@ func main() {
 		fmt.Println(err.Error())
 	}
 	mainChar := character.NewMainCharacter(name)
-	scenario.Run(mainChar)
+	scenario := newWorldScenario.NWScenario{MainChar: mainChar}
+	scenario.Run()
 }

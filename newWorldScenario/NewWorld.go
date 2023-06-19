@@ -1,23 +1,44 @@
-package scenario
+package newWorldScenario
 
 import (
 	"fmt"
 	"go_course/hw3/character"
 	"go_course/hw3/safeMiniGame"
+	"go_course/hw3/textOutput"
 )
 
-func Run(character character.MainCharacter) {
-
-	fmt.Printf("%s прокидається біля входу в печеру. \n"+
-		" Він знаходиться в стані дезорієнтації і не пам'ятає, як сюди потрапив. "+
-		"\nПоруч з ним лежить рюкзак, в якому він виявляє Ніж, Фонар та Сірники.\n"+
-		" У печері темно, тому %s вирішує піти стежкою, що веде від печери до лісу..", character.Name, character.Name)
-
-	action1(&character)
-
+type NWScenario struct {
+	MainChar           character.MainCharacter
+	firstActionChoice  int
+	secondActionChoice int
+	output             textOutput.Output
 }
 
-func chose() int {
+func (nws *NWScenario) Run() {
+	nws.intro()
+	nws.action1()
+
+	fmt.Println(nws.firstActionChoice)
+	if nws.firstActionChoice == 1 {
+		nws.action2()
+	}
+
+	if nws.secondActionChoice == 1 {
+		nws.action3()
+		nws.insideTheSafe()
+	}
+}
+
+func (nws *NWScenario) intro() {
+	text := fmt.Sprintf("%s прокидається біля входу в печеру. \n"+
+		" Він знаходиться в стані дезорієнтації і не пам'ятає, як сюди потрапив. "+
+		"\nПоруч з ним лежить рюкзак, в якому він виявляє Ніж, Фонар та Сірники.\n"+
+		" У печері темно, тому %s вирішує піти стежкою, що веде від печери до лісу..", nws.MainChar.Name, nws.MainChar.Name)
+
+	nws.output.TextOutput(text)
+}
+
+func (nws *NWScenario) chose() int {
 	var chosenVar int
 	_, err := fmt.Scanln(&chosenVar)
 
@@ -28,25 +49,25 @@ func chose() int {
 	return chosenVar
 }
 
-func action1(char *character.MainCharacter) {
-	fmt.Println("Оберіть дію:\n\n" +
+func (nws *NWScenario) action1() {
+	var actionText string
+	choiceText := fmt.Sprintln("Оберіть дію:\n\n" +
 		"1 - Використати сірники, щоб запалити ліхтарик.\n" +
 		"2 - Залишити печеру, не використовуючи сірники.")
-	variant := chose()
-
-	switch variant {
+	nws.output.TextOutput(choiceText)
+	nws.firstActionChoice = nws.chose()
+	switch nws.firstActionChoice {
 	case 1:
-		fmt.Printf("%s розуміє, що в темряві печери без джерела світла йому буде складно дібратися до лісу. \n"+
+		actionText = fmt.Sprintf("%s розуміє, що в темряві печери без джерела світла йому буде складно дібратися до лісу. \n"+
 			"Тому він вирішує скористатися сірниками, щоб запалити ліхтарик і мати світло на своєму шляху."+
 			"\n\nВін бере сірники з рюкзака, розпалює один з них об ребро коробки і намагається запалити ліхтарик. \n"+
 			"Перші кілька спроб невдалі, але нарешті вогник вогнююється, і ліхтарик освітлює навколишнє середовище.\n\n"+
 			"З світлом ліхтарика %s продовжує свій шлях по стежці, що веде від печери до лісу. Кожен його крок освітлюється маленьким плямкою світла, \n"+
 			" дозволяючи йому впевнено рухатися вперед. \n"+
 			"\n\nПройшовши кілька хвилин, %s помічає щось несподіване. Його погляд падає на мертве тіло дивної тварини, що лежить на землі. \n"+
-			" Вона виглядає дуже незвичайно, і його цікавість викликає бажання розслідувати ситуацію.", char.Name, char.Name, char.Name)
-		action2(char)
+			" Вона виглядає дуже незвичайно, і його цікавість викликає бажання розслідувати ситуацію.", nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name)
 	case 2:
-		fmt.Printf("%s вирішує не використовувати сірники і вийти з печери без додаткового джерела світла. \n"+
+		actionText = fmt.Sprintf("%s вирішує не використовувати сірники і вийти з печери без додаткового джерела світла. \n"+
 			" Він обирає полічити на власний розум і використати наявні навички для навігації в темряві."+
 			"\n\nЩоб продовжити свій шлях, %s обертається у напрямку, в якому він вважає, "+
 			"\nщо може знаходиться вихід з печери. Він обережно просувається, стараючись уникнути перешкод і не заблукати."+
@@ -61,30 +82,33 @@ func action1(char *character.MainCharacter) {
 			"\nЙого тіло падає на холодний камінь печери, і його подих стає все слабкішим."+
 			"\n\nТак завершується шлях %sа, який вирішив залишити печеру без використання сірників. "+
 			"\nТемрява пожирає його, залишивши безслідним у невідомому світі підземель. "+
-			"\n\nГРА ЗАВЕРШЕНА", char.Name, char.Name, char.Name, char.Name, char.Name, char.Name)
+			"\n\nГРА ЗАВЕРШЕНА", nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name)
 	default:
-		action1(char)
+		nws.action1()
 	}
+
+	nws.output.TextOutput(actionText)
 }
 
-func action2(char *character.MainCharacter) {
-	fmt.Printf("\n\n%s стоїть перед вибором:"+
+func (nws *NWScenario) action2() {
+	var actionText string
+	nws.output.TextOutput(fmt.Sprintf("\n\n%s стоїть перед вибором:"+
 		"\n\n1 - Проігнорувати мертву тварину і продовжити свій шлях до лісу."+
-		"\n2 - Підійти ближче до тварини, щоб її розгледіти та дослідити", char.Name)
+		"\n2 - Підійти ближче до тварини, щоб її розгледіти та дослідити", nws.MainChar.Name))
 
-	variant := chose()
+	nws.secondActionChoice = nws.chose()
 
-	switch variant {
+	switch nws.secondActionChoice {
 	case 1:
-		fmt.Printf("%s вирішує проігнорувати мертву тварину і продовжити свій шлях до лісу. \n"+
+		actionText = fmt.Sprintf("%s вирішує проігнорувати мертву тварину і продовжити свій шлях до лісу. \n"+
 			"Він розуміє, що темрява печери може приховувати небезпеки, і йому краще не затримуватися на місці."+
 			"\n\nПройшовши кілька кроків, %s попадає до лісу. Серед дерев він помічає наметове містечко на невеликій відстані.\n"+
 			"Втомлений і потребуючи відпочинку, він вирішує піти до табору."+
 			"\n\nУ таборі %s знаходить порожні намети та розбиті речі. Його увагу привертає найближчий намет, \n"+
-			"в якому він помічає сейф з кодовим замком. Це викликає його цікавість, і він вирішує спробувати відкрити сейф.", char.Name, char.Name, char.Name)
-		action3(char)
+			"в якому він помічає сейф з кодовим замком. Це викликає його цікавість, і він вирішує спробувати відкрити сейф.", nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name)
+		nws.action3()
 	case 2:
-		fmt.Printf("%s вирішує підійти ближче до мертвої тварини, щоб розгледіти її та дослідити. \n"+
+		actionText = fmt.Sprintf("%s вирішує підійти ближче до мертвої тварини, щоб розгледіти її та дослідити. \n"+
 			"Він зацікавлений у тому, що це за тварина і чому вона загинула."+
 			"\n\n%s обережно наближається до тіла і зупиняється поруч з ним. Він ретельно розглядає тварину і \n"+
 			" помічає дивні ознаки: незвичайну форму тіла, незнайомі кольори та риси. Виглядає, що ця тварина належить \n"+
@@ -95,29 +119,32 @@ func action2(char *character.MainCharacter) {
 			"опускається на землю і втрачає свідомість."+
 			"\n\nНажаль, вибір підійти ближче до мертвої тварини був фатальним для %sа. \n"+
 			" Його дослідження завершилося трагічно, і він став ще одним загадковим елементом в цьому невідомому світі."+
-			"\n\nГРА ЗАВЕРШЕНА", char.Name, char.Name, char.Name, char.Name, char.Name, char.Name)
+			"\n\nГРА ЗАВЕРШЕНА", nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name)
 	default:
-		action2(char)
+		nws.action2()
 	}
+
+	nws.output.TextOutput(actionText)
 }
 
-func action3(char *character.MainCharacter) {
-	fmt.Printf("На вигляд замок має два цифрові дисплеї, \n"+
+func (nws *NWScenario) action3() {
+	actionText := fmt.Sprintf("На вигляд замок має два цифрові дисплеї, \n"+
 		"на яких можна встановити числа від 0 до 9. %s знає, що для відкриття сейфа потрібно ввести правильний двоцифровий код. \n"+
 		" згадує, що під час своєї подорожі він знайшов записку з підказкою щодо коду."+
 		"\n\n%s переглядає записку, де зазначено, що сума цифр коду дорівнює 12, а різниця між цифрами становить 4. \n"+
-		"За допомогою цих підказок він починає спробувати різні комбінації.", char.Name, char.Name)
-	code := safeMiniGame.CodeTry()
+		"За допомогою цих підказок він починає спробувати різні комбінації.", nws.MainChar.Name, nws.MainChar.Name)
+	nws.output.TextOutput(actionText)
+	safe := safeMiniGame.Safe{Output: nws.output}
+	code := safe.CodeTry()
 
-	fmt.Printf("Після кількох спроб він набирає код %s. Запрокинувши душу, він повертає курок замка. \n"+
+	codeTryText := fmt.Sprintf("Після кількох спроб він набирає код %s. Запрокинувши душу, він повертає курок замка. \n"+
 		"Чути легкий клацання, і сейф відчиняєся з легким шорстканням. \n"+
-		"%s відчиняє сейф і з великим захопленням дивиться на його вміст.", code, char.Name)
-	insideTheSafe(char)
-
+		"%s відчиняє сейф і з великим захопленням дивиться на його вміст.", code, nws.MainChar.Name)
+	nws.output.TextOutput(codeTryText)
 }
 
-func insideTheSafe(char *character.MainCharacter) {
-	fmt.Printf("В сейфі він знаходить кришталевий амулет і записку з підказкою, що цей амулет має особливі магічні \n"+
+func (nws *NWScenario) insideTheSafe() {
+	nws.output.TextOutput(fmt.Sprintf("В сейфі він знаходить кришталевий амулет і записку з підказкою, що цей амулет має особливі магічні \n"+
 		"властивості, які можуть допомогти йому у подорожі. \n"+
 		"За допомогою амулета він може активувати магічні бар'єри або звертатися до розумних істот."+
 		"\n\n%s радісно бере амулет і записку, відчуваючи силу, що випромінюється від цього дивовижного предмета. \n"+
@@ -128,5 +155,5 @@ func insideTheSafe(char *character.MainCharacter) {
 		"Відповіді на ці питання відкриються лише в подальших виборах та пригодах %sа."+
 		"\n\nНовий світ чекає на %sа. Чи буде він героєм своєї власної історії чи просто зникне в безкрайніх \n"+
 		"таємницях цього загадкового світу? Відповідь лежить у його руках."+
-		"\n\nГра продовжується...", char.Name, char.Name, char.Name, char.Name)
+		"\n\nГра продовжується...", nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name, nws.MainChar.Name))
 }

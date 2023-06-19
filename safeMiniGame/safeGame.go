@@ -3,12 +3,17 @@ package safeMiniGame
 import (
 	"bufio"
 	"fmt"
+	"go_course/hw3/textOutput"
 	"os"
 )
 
-func CodeTry() string {
+type Safe struct {
+	Output textOutput.Output
+}
+
+func (s Safe) CodeTry() string {
 	combination := "59"
-	fmt.Println("Введіть комбінацію із двох цифр коду: ")
+	s.Output.TextOutput(fmt.Sprintln("Введіть комбінацію із двох цифр коду: "))
 	scanner := bufio.NewScanner(os.Stdin)
 	var userInput string
 
@@ -18,10 +23,10 @@ func CodeTry() string {
 		}
 		userInput = scanner.Text()
 		if userInput == combination {
-			fmt.Printf("Поздоровляю! Код вірний\n\n")
+			s.Output.TextOutput(fmt.Sprintf("Поздоровляю! Код вірний\n\n"))
 			break
 		} else {
-			fmt.Printf("Код не вірний. Спробуй ще\n\n")
+			s.Output.TextOutput(fmt.Sprintf("Код не вірний. Спробуй ще\n\n"))
 		}
 	}
 
